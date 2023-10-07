@@ -1,0 +1,20 @@
+GET http://localhost:3001/pendencias
+
+###
+
+POST http://localhost:3001/pendencias/new
+Content-Type: application/json
+
+{
+    "id": "113",
+    "titulo": "Teste API",
+    "tipo": "teste",
+    "responsavel": "eu",
+    "dateinit": "07/10/2023 01:09",
+    "dateend": "07/10/2023 01:09",
+    "dateatt": "07/10/2023 01:09"
+}
+
+###
+
+DELETE http://localhost:3001/pendencias/delete/14
