@@ -1,10 +1,28 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const Andamentos = new Schema({
+    id: {
+       type: Number,
+       required: true 
+    },
+    dateandamento: {
+        type: String,
+        default: Date.now(),
+        required: false
+    },
+    user: {
+        type: String,
+        required: true
+    }
+})
+
+
 const PendenSchema = new Schema({
     id: {
         type: Number,
-        required: true
+        required: false,
+        unique: true
     },
     complete: {
         type: Boolean,
@@ -13,6 +31,10 @@ const PendenSchema = new Schema({
     titulo: {
         type: String,
         required: true
+    },
+    desc: {
+        type: String,
+        required: false
     },
     tipo: {
         type: String, 
@@ -34,11 +56,6 @@ const PendenSchema = new Schema({
         type: String,
         required: true
     },
-    datenow: {
-        type: String,
-        default: Date.now(),
-        required: false
-    },
     taskid: {
         type: Number,
         required: false
@@ -46,8 +63,29 @@ const PendenSchema = new Schema({
     incidenturl: {
         type: String,
         required: false
+    },
+    abertura: {
+        user: {
+            type: String,
+            required: false,
+            default: 1
+        },
+        dateopening: {
+            type: String,
+            default: Date.now(),
+            required: false
+        }
+    },
+    andamento: [Andamentos],
+    fechamento: {
+        user: {
+            type: String,
+            required: false,
+            default: 1
+        }
     }
 })
+
 
 const Pendencias = mongoose.model("Pendencia", PendenSchema)
 

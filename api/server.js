@@ -16,24 +16,33 @@ mongoose.connect("mongodb://10.10.10.150:27017/pendencias", {
 
 const Pendencias = require("./models/pendencias");
 
-app.get("/pendencias", async (req, res) => {   //se fizer uma request pro localhost 3001/pendencias ele já vai retornar a lista toda
-    const pendens = await Pendencias.find();   //aqui eu jogo na variável um find que eu rodo pelo mongoose, que criei no pendencias.js
+app.get("/pendencias", async (req, res) => {   //busca pendencias
+    const pendens = await Pendencias.find();   
 
     res.json(pendens);
 })
 
-app.post("/pendencias/new", (req, res) => {
+app.post("/pendencias/new", async (req, res) => { //nova pendencia, form de nova pendencias
+    const count = await Pendencias.countDocuments();
+
     const pendencia = new Pendencias({
-        id: req.body.id,
+        id: count + 1,  //por enquanto vai ficar assim, mais pra frente implementar uma coleção counter e atualizar atomicamente
         titulo: req.body.titulo,
-        tipo: req.body.titulo,
+        desc: req.body.desc,
+        tipo: req.body.tipo,
         responsavel: req.body.responsavel,
         dateinit: req.body.dateinit,
         dateend: req.body.dateend,
-        dateatt: req.body.dateatt,
+        dateatt: req.body.dateatt, 
+        abertura: {
+            user: ""
+        },
+        fechamento: {
+            user: ""
+        }
     });
 
-    pendencia.save();
+    const savependencia = await pendencia.save();
 
     res.json(pendencia);
 })
