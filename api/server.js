@@ -4,6 +4,8 @@ const cors = require("cors");
 
 const app = express();
 
+app.listen(3001, () => console.log("Server started on port 3001"));
+
 app.use(express.json());
 app.use(cors());
 
@@ -16,9 +18,8 @@ mongoose.connect("mongodb://10.10.10.150:27017/pendencias", {
 
 const Pendencias = require("./models/pendencias");
 
-app.get("/pendencias", async (req, res) => {   //busca pendencias
+app.get("/getpendencias", async (req, res) => {   //busca pendencias
     const pendens = await Pendencias.find();   
-
     res.json(pendens);
 })
 
@@ -64,4 +65,3 @@ app.put("/pendencias/complete/:id", async (req, res) => {
 })
 
 
-app.listen(3001, () => console.log("Server started on port 3001"));
