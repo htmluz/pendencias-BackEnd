@@ -22,6 +22,16 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:3001/usuarios/new
+Content-Type: application/json
+
+{
+    "user": "luiz.krol",
+    "pwd": "Teste123!"
+}
+
+###
+
 DELETE http://localhost:3001/pendencias/delete/10
 
 ###

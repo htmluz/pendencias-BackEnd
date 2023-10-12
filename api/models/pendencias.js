@@ -64,24 +64,29 @@ const PendenSchema = new Schema({
         type: String,
         required: false
     },
-    // abertura: {
-    //     user: {
-    //         type: String,
-    //         required: true,
-    //     },
-    //     dateopening: {
-    //         type: String,
-    //         default: Date.now(),
-    //         required: false
-    //     }
-    // },
+    abertura: {
+        user: {
+            type: String,
+            required: false,
+        },
+        dateopening: {
+            type: String,
+            default: Date.now(),
+            required: false
+        }
+    },
     // andamento: [Andamentos],
-    // fechamento: {
-    //     user: {
-    //         type: String,
-    //         required: true, 
-    //     }
-    // }
+    fechamento: {
+        user: {
+            type: String,
+            required: false, 
+        },
+        dateclosening: {
+            type: String,
+            default: Date.now(),
+            required: false
+        }
+    }
 })
 
 
