@@ -10,6 +10,10 @@ const UserSchema = new Schema({
     pwd: {
         type: String,
         required: true
+    },
+    refreshtoken: {
+        type: String,
+        required: false
     }
 })
 
