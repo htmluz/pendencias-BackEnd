@@ -81,7 +81,6 @@ const handleLogin = async (req, res) => {
         res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
         res.json({accessToken});
     } else {
-        console.log("aqui");
         res.sendStatus(401);
     }
 }
@@ -138,6 +137,10 @@ const handleLogout = async (req, res) => {
 }
 
 
+const getUsuarios = async (req, res) => {   
+    const users = await Usuarios.find();   
+    res.json(users);
+}
 
 //pendencias
 
@@ -187,9 +190,10 @@ function formataData(date) {
 
 app.post("/usuarios/new", novoUsuario);
 app.post("/usuarios/auth", handleLogin);
-app.get("/usuarios/refresh", handleRefreshToken)
+app.get("/usuarios/refresh", handleRefreshToken);
 app.get("/usuarios/logout", handleLogout);
-app.use(verificarJWT);
+app.get("/usuarios/get", getUsuarios);
+//app.use(verificarJWT);
 app.get("/getpendencias", getPendencias);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
