@@ -5,11 +5,24 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
+const allowedOrigins = require('./config/alllowedOrigins');
+const corsOptions = require("./config/corsOptions");
+
+
+const credentials = (req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        // res.header('Access-Control-Allow-Origin', origin)
+        res.header('Access-Control-Allow-Credentials', true);
+    }
+    next();
+}
 
 const app = express();
 
 app.listen(3001, () => console.log("Server started on port 3001"));
-app.use(cors());
+app.use(credentials);
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -23,6 +36,7 @@ mongoose.connect("mongodb://10.10.10.150:27017/pendencias", {
 
 const Pendencias = require("./models/pendencias");
 const Usuarios = require("./models/usuarios");
+
 
 //usuarios e autenticacao
 
@@ -67,6 +81,7 @@ const handleLogin = async (req, res) => {
         res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
         res.json({accessToken});
     } else {
+        console.log("aqui");
         res.sendStatus(401);
     }
 }
