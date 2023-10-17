@@ -36,9 +36,16 @@ mongoose.connect("mongodb://10.10.10.150:27017/pendencias", {
 
 const Pendencias = require("./models/pendencias");
 const Usuarios = require("./models/usuarios");
+const Tipos = require("./models/tipos")
+
+function formataData(date) {
+    date = date.replace(/T/g, ' ');
+    date = date.replace(/-/g , '/')
+    return date;
+}
 
 
-//usuarios e autenticacao
+//usuarios
 
 const novoUsuario = async (req, res) => {
     const { user, pwd } = req.body;
@@ -55,6 +62,15 @@ const novoUsuario = async (req, res) => {
         res.status(500).json({ 'message': err.message })
     }
 } 
+
+const getUsuarios = async (req, res) => {   
+    const users = await Usuarios.find();   
+    res.json(users);
+}
+
+
+
+//autenticacao
 
 const handleLogin = async (req, res) => {
     const { user, pwd } = req.body;
@@ -137,10 +153,21 @@ const handleLogout = async (req, res) => {
 }
 
 
-const getUsuarios = async (req, res) => {   
-    const users = await Usuarios.find();   
-    res.json(users);
+//tipos
+const newTipo = async (req, res) => {
+    const tipos = new Tipos({
+        tipo: req.body.tipo
+    });
+
+    const savetipo = await tipos.save();
+    res.json(tipos);
 }
+
+const getTipos = async (req, res) => {
+    const tipos = await Tipos.find();
+    res.json(tipos);
+}
+
 
 //pendencias
 
@@ -161,6 +188,8 @@ const novaPendencia = async (req, res) => {
         dateinit: formataData(req.body.dateinit),
         dateend: formataData(req.body.dateend),
         dateatt: formataData(req.body.dateatt), 
+        taskid: req.body.taskid,
+        incidenturl: req.body.incidenturl,
         abertura: req.body.abertura,
         fechamento: {
             user: ""
@@ -173,19 +202,18 @@ const novaPendencia = async (req, res) => {
 }
 
 const completaPendencia = async (req, res) => {     //vai ser enviado um form, alterar fechamento.user e fechamento.dateclosening
-    const pendencia = await Pendencias.findOne({id: req.params.id});                                    
-    pendencia.complete = !pendencia.complete; 
+    const pendencia = await Pendencias.findOne({id: req.params.id});        
+    console.log("1")                            
+    pendencia.complete = true; 
+    pendencia.fechamento.user = req.body.fechamento.user;
+    pendencia.fechamento.dateclosening = formataData(req.body.fechamento.dateclosening);
+    console.log("2")
+    console.log(req.body)
     pendencia.save();
     res.json(pendencia)
 }
 
-function formataData(date) {
-    date = date.replace(/T/g, ' ');
-    date = date.replace(/-/g , '/')
-    return date;
-}
 
-// vou fazer inicialmente assim, modelo mvc rest api parece uma boa ideia
 //rotas
 
 app.post("/usuarios/new", novoUsuario);
@@ -197,6 +225,8 @@ app.get("/usuarios/get", getUsuarios);
 app.get("/getpendencias", getPendencias);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
+app.post("/tipos/new", newTipo);
+app.get("/tipos/get", getTipos);
 app.delete("/pendencias/delete/:id", async (req, res) => {
     const result = await Pendencias.findOneAndDelete({id: req.params.id});
 
