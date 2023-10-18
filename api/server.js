@@ -203,16 +203,29 @@ const novaPendencia = async (req, res) => {
 
 const completaPendencia = async (req, res) => {     //vai ser enviado um form, alterar fechamento.user e fechamento.dateclosening
     const pendencia = await Pendencias.findOne({id: req.params.id});        
-    console.log("1")                            
     pendencia.complete = true; 
     pendencia.fechamento.user = req.body.fechamento.user;
     pendencia.fechamento.dateclosening = formataData(req.body.fechamento.dateclosening);
-    console.log("2")
-    console.log(req.body)
     pendencia.save();
     res.json(pendencia)
 }
 
+
+const editPendencia = async (req, res) => {
+    const pendencia = await Pendencias.findOneAndUpdate({id: req.params.id},
+        { $set: { titulo: req.body.titulo,
+        tipo: req.body.tipo,
+        responsavel: req.body.responsavel,
+        dateinit: req.body.dateinit,
+        dateend: req.body.dateend,
+        dateatt: req.body.dateatt,
+        desc: req.body.desc,
+        taskid: req.body.taskid,
+        incidenturl: req.body.incidenturl }
+        });
+    pendencia.save();
+    res.json(pendencia);
+}
 
 //rotas
 
@@ -225,6 +238,7 @@ app.get("/usuarios/get", getUsuarios);
 app.get("/getpendencias", getPendencias);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
+app.put("/pendencias/edit/:id", editPendencia);
 app.post("/tipos/new", newTipo);
 app.get("/tipos/get", getTipos);
 app.delete("/pendencias/delete/:id", async (req, res) => {
