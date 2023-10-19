@@ -185,9 +185,9 @@ const novaPendencia = async (req, res) => {
         desc: req.body.desc,
         tipo: req.body.tipo,
         responsavel: req.body.responsavel,
-        dateinit: formataData(req.body.dateinit),
-        dateend: formataData(req.body.dateend),
-        dateatt: formataData(req.body.dateatt), 
+        dateinit: req.body.dateinit,
+        dateend: req.body.dateend,
+        dateatt: req.body.dateatt, 
         taskid: req.body.taskid,
         incidenturl: req.body.incidenturl,
         abertura: req.body.abertura,
@@ -205,7 +205,7 @@ const completaPendencia = async (req, res) => {     //vai ser enviado um form, a
     const pendencia = await Pendencias.findOne({id: req.params.id});        
     pendencia.complete = true; 
     pendencia.fechamento.user = req.body.fechamento.user;
-    pendencia.fechamento.dateclosening = formataData(req.body.fechamento.dateclosening);
+    pendencia.fechamento.dateclosening = req.body.fechamento.dateclosening;
     pendencia.save();
     res.json(pendencia)
 }
