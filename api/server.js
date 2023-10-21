@@ -7,7 +7,7 @@ require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const allowedOrigins = require('./config/alllowedOrigins');
 const corsOptions = require("./config/corsOptions");
-
+const moment = require("moment-timezone")
 
 const credentials = (req, res, next) => {
     const origin = req.headers.origin;
@@ -37,12 +37,8 @@ mongoose.connect("mongodb://10.10.10.150:27017/pendencias", {
 const Pendencias = require("./models/pendencias");
 const Usuarios = require("./models/usuarios");
 const Tipos = require("./models/tipos")
+const Counter = require("./models/counter")
 
-function formataData(date) {
-    date = date.replace(/T/g, ' ');
-    date = date.replace(/-/g , '/')
-    return date;
-}
 
 
 //usuarios
@@ -171,16 +167,23 @@ const getTipos = async (req, res) => {
 
 //pendencias
 
+async function getNextId() {
+    const counter = await Counter.findOneAndUpdate( {name: "contador"}, 
+        { $inc: { count: 1 } },
+        { new: true }
+        );
+        return counter.count;
+}
+
 const getPendencias = async (req, res) => {   //busca pendencias
     const pendens = await Pendencias.find();   
     res.json(pendens);
 }
 
 const novaPendencia = async (req, res) => {
-    const count = await Pendencias.countDocuments();
-
+    const nextId = await getNextId();
     const pendencia = new Pendencias({
-        id: count + 1,  //por enquanto vai ficar assim, mais pra frente implementar uma collection counter e atualizar atomicamente
+        id: nextId,
         titulo: req.body.titulo,
         desc: req.body.desc,
         tipo: req.body.tipo,
@@ -195,9 +198,7 @@ const novaPendencia = async (req, res) => {
             user: ""
         }
     });
-
     const savependencia = await pendencia.save();
-
     res.json(pendencia);
 }
 
@@ -227,6 +228,19 @@ const editPendencia = async (req, res) => {
     res.json(pendencia);
 }
 
+const newAndamento = async (req, res) => {
+    const novoAndamento = {
+        id: req.body.andamento.id,
+                dateandamento: moment().tz("America/Sao_Paulo"),
+                user: req.body.andamento.user,
+                andamento: req.body.andamento.andamento
+    }
+    const andamento = await Pendencias.findOneAndUpdate({id: req.params.id},
+        { $push: { andamento: novoAndamento } }
+        );
+    res.json(andamento);
+}
+
 //rotas
 
 app.post("/usuarios/new", novoUsuario);
@@ -239,6 +253,7 @@ app.get("/getpendencias", getPendencias);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
 app.put("/pendencias/edit/:id", editPendencia);
+app.put("/pendencias/andamento/:id", newAndamento);
 app.post("/tipos/new", newTipo);
 app.get("/tipos/get", getTipos);
 app.delete("/pendencias/delete/:id", async (req, res) => {

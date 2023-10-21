@@ -1,19 +1,22 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const Andamentos = new Schema({
+const AndamentosSchema = new Schema({
     id: {
        type: Number,
-       required: true 
+       required: false 
     },
     dateandamento: {
-        type: String,
-        default: Date.now(),
+        type: Date,
         required: false
     },
     user: {
         type: String,
-        required: true
+        required: false
+    },
+    andamento: {
+        type: String,
+        required: false
     }
 })
 
@@ -45,15 +48,15 @@ const PendenSchema = new Schema({
         required: true
     },
     dateinit: {
-        type: String,
+        type: Date,
         required: true
     },
     dateend: {
-        type: String,
+        type: Date,
         required: true
     },
     dateatt: {
-        type: String,
+        type: Date,
         required: true
     },
     taskid: {
@@ -70,20 +73,20 @@ const PendenSchema = new Schema({
             required: false,
         },
         dateopening: {
-            type: String,
-            default: Date.now(),
+            type: Date,
+            default: new Date(),
             required: false
         }
     },
-    // andamento: [Andamentos],
+    andamento: [AndamentosSchema],
     fechamento: {
         user: {
             type: String,
             required: false, 
         },
         dateclosening: {
-            type: String,
-            default: Date.now(),
+            type: Date,
+            default: new Date(),
             required: false
         }
     }
