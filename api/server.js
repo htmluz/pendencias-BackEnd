@@ -120,14 +120,15 @@ const handleRefreshToken = async (req, res) => {
 
 const verificarJWT = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.sendStatus(401);
+    if (!authHeader) return res.sendStatus(401); //se n existir header auth volta 401
     console.log(authHeader);
     const token = authHeader.split(' ')[1]  //isso aqui pq ele volta em duas palavras o token, splito com o espaco e pego o segundo dentro do array
     jwt.verify(
         token,
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
-            if (err) return res.sendStatus(403);
+            if (err) {
+             return res.sendStatus(403)}
             req.user = decoded.user;
             next();
         }
@@ -248,7 +249,7 @@ app.post("/usuarios/auth", handleLogin);
 app.get("/usuarios/refresh", handleRefreshToken);
 app.get("/usuarios/logout", handleLogout);
 app.get("/usuarios/get", getUsuarios);
-//app.use(verificarJWT);
+app.use(verificarJWT);
 app.get("/getpendencias", getPendencias);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
