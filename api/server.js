@@ -14,8 +14,8 @@ const credentials = (req, res, next) => {
     if (allowedOrigins.includes(origin)) {
         // res.header('Access-Control-Allow-Origin', origin)
         res.header('Access-Control-Allow-Credentials', true);
-    }
     next();
+    }
 }
 
 const app = express();
@@ -64,7 +64,11 @@ const getUsuarios = async (req, res) => {
     res.json(users);
 }
 
-
+const deleteUsuario = async (req, res) => {
+    const userToDelete = await Usuarios.findOneAndDelete({ user: req.params.name })
+    res.status(200);
+    res.json(userToDelete);
+}
 
 //autenticacao
 
@@ -121,7 +125,6 @@ const handleRefreshToken = async (req, res) => {
 const verificarJWT = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.sendStatus(401); //se n existir header auth volta 401
-    console.log(authHeader);
     const token = authHeader.split(' ')[1]  //isso aqui pq ele volta em duas palavras o token, splito com o espaco e pego o segundo dentro do array
     jwt.verify(
         token,
@@ -163,6 +166,12 @@ const newTipo = async (req, res) => {
 const getTipos = async (req, res) => {
     const tipos = await Tipos.find();
     res.json(tipos);
+}
+
+const deleteTipo = async (req, res) => {
+    const tipoToDelete = await Tipos.findOneAndDelete({ tipo: req.params.tipo })
+    res.status(200);
+    res.json(tipoToDelete);
 }
 
 
@@ -257,6 +266,8 @@ app.put("/pendencias/edit/:id", editPendencia);
 app.put("/pendencias/andamento/:id", newAndamento);
 app.post("/tipos/new", newTipo);
 app.get("/tipos/get", getTipos);
+app.delete("/tipos/delete/:tipo", deleteTipo)
+app.delete("/usuarios/delete/:name", deleteUsuario)
 app.delete("/pendencias/delete/:id", async (req, res) => {
     const result = await Pendencias.findOneAndDelete({id: req.params.id});
 
