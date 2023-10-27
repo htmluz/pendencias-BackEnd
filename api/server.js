@@ -8,6 +8,8 @@ const cookieParser = require('cookie-parser');
 const allowedOrigins = require('./config/alllowedOrigins');
 const corsOptions = require("./config/corsOptions");
 const moment = require("moment-timezone")
+const https = require('https');
+const fs = require('fs');
 
 const credentials = (req, res, next) => {
     const origin = req.headers.origin;
@@ -20,7 +22,19 @@ const credentials = (req, res, next) => {
 
 const app = express();
 
-app.listen(3001, () => console.log("Server started on port 3001"));
+
+const options = {
+    key: fs.readFileSync('/root/luiz/pendencias-Backend/certs/private/pm2cert.key'),
+    cert: fs.readFileSync('/root/luiz/pendencias-Backend/certs/pm2cert.crt')
+};
+
+const httpsServer = https.createServer(options, app);
+httpsServer.listen(3001, () => {
+    console.log('Https server started on port 3001');
+});
+
+
+//app.listen(3001, () => console.log("Server started on port 3001"));
 app.use(credentials);
 app.use(cors(corsOptions));
 app.use(express.json());
