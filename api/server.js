@@ -23,18 +23,18 @@ const credentials = (req, res, next) => {
 const app = express();
 
 
-const options = {
-    key: fs.readFileSync('/root/luiz/pendencias-Backend/certs/private/pm2cert.key'),
-    cert: fs.readFileSync('/root/luiz/pendencias-Backend/certs/pm2cert.crt')
-};
+// const options = {
+//     key: fs.readFileSync(''),
+//     cert: fs.readFileSync('')
+// };
 
-const httpsServer = https.createServer(options, app);
-httpsServer.listen(3001, () => {
-    console.log('Https server started on port 3001');
-});
+// const httpsServer = https.createServer(options, app);
+// httpsServer.listen(3001, () => {
+//     console.log('Https server started on port 3001');
+// });
 
 
-//app.listen(3001, () => console.log("Server started on port 3001"));
+app.listen(3001, () => console.log("Server started on port 3001"));
 app.use(credentials);
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -82,6 +82,17 @@ const deleteUsuario = async (req, res) => {
     const userToDelete = await Usuarios.findOneAndDelete({ user: req.params.name })
     res.status(200);
     res.json(userToDelete);
+}
+
+const editUsuario = async (req, res) => {
+    console.log(req.body);
+    const { pwd } = req.body;
+    console.log(pwd);
+    const hashedPwd = await bcrypt.hash(pwd, 10);
+    const userEdit = await Usuarios.findOneAndUpdate({ user: req.params.name },
+        { $set: { pwd: hashedPwd }})
+    userEdit.save();
+    res.json(userEdit);  
 }
 
 //autenticacao
@@ -280,8 +291,9 @@ app.put("/pendencias/edit/:id", editPendencia);
 app.put("/pendencias/andamento/:id", newAndamento);
 app.post("/tipos/new", newTipo);
 app.get("/tipos/get", getTipos);
-app.delete("/tipos/delete/:tipo", deleteTipo)
-app.delete("/usuarios/delete/:name", deleteUsuario)
+app.delete("/tipos/delete/:tipo", deleteTipo);
+app.put("/usuarios/edit/:name", editUsuario);
+app.delete("/usuarios/delete/:name", deleteUsuario);
 app.delete("/pendencias/delete/:id", async (req, res) => {
     const result = await Pendencias.findOneAndDelete({id: req.params.id});
 
