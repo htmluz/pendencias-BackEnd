@@ -24,8 +24,8 @@ const app = express();
 
 
 // const options = {
-//     key: fs.readFileSync(''),
-//     cert: fs.readFileSync('')
+//     key: fs.readFileSync('/etc/pki/nginx/private/server.key'),
+//     cert: fs.readFileSync('/etc/pki/nginx/server.crt')
 // };
 
 // const httpsServer = https.createServer(options, app);
@@ -120,6 +120,7 @@ const handleLogin = async (req, res) => {
         );
         insertRefreshToken.save();
         res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
+        res.cookie('logged', 'yes', {httpOnly: false, sameSite:'None', secure: true, maxAge: 24 * 60 * 60 * 1000 }); //top 10 implementacoes de manter login
         res.json({accessToken});
     } else {
         res.sendStatus(401);
@@ -164,7 +165,6 @@ const verificarJWT = (req, res, next) => {
 }
 
 const handleLogout = async (req, res) => {
-    //tambem deletar o accesstoken no frontend
     const cookies = req.cookies
     if(!cookies?.jwt) return res.sendStatus(204);
     const refreshToken = cookies.jwt
