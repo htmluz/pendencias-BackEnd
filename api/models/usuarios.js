@@ -14,6 +14,11 @@ const UserSchema = new Schema({
     refreshtoken: {
         type: String,
         required: false
+    },
+    roles: {
+        type: Number,
+        required: false,
+        default: 666
     }
 })
 

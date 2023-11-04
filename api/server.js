@@ -64,7 +64,8 @@ const novoUsuario = async (req, res) => {
         const hashedPwd = await bcrypt.hash(pwd, 10);
         const newUser = new Usuarios({
             user: req.body.user,
-            pwd: hashedPwd
+            pwd: hashedPwd,
+            roles: req.body.roles
         })
         const saveuser = await newUser.save()
         res.status(201).json({ 'success:': `Novo usuario ${user} criado`})
@@ -85,14 +86,20 @@ const deleteUsuario = async (req, res) => {
 }
 
 const editUsuario = async (req, res) => {
-    console.log(req.body);
-    const { pwd } = req.body;
-    console.log(pwd);
-    const hashedPwd = await bcrypt.hash(pwd, 10);
-    const userEdit = await Usuarios.findOneAndUpdate({ user: req.params.name },
-        { $set: { pwd: hashedPwd }})
-    userEdit.save();
-    res.json(userEdit);  
+    if (req.body.pwd === '') {
+        const userEdit = await Usuarios.findOneAndUpdate({ user: req.params.name },
+            { $set: { roles: req.body.roles }})
+        userEdit.save()
+        res.json(userEdit)
+    } else {
+        const { pwd } = req.body;
+        const hashedPwd = await bcrypt.hash(pwd, 10);
+        const userEdit = await Usuarios.findOneAndUpdate({ user: req.params.name },
+            { $set: { pwd: hashedPwd, roles: req.body.roles }})
+        userEdit.save();
+        res.json(userEdit)
+    } 
+    
 }
 
 //autenticacao
@@ -101,13 +108,14 @@ const handleLogin = async (req, res) => {
     const { user, pwd } = req.body;
     if(!user || !pwd) return res.status(400).json({ 'message': 'Usuário e senha são necessários.'});
     const foundUser = await Usuarios.findOne({ user: user});
+    const role = foundUser.roles
     if (!foundUser) return res.sendStatus(401);
     const match = await bcrypt.compare(pwd, foundUser.pwd)
     if (match) {
         const accessToken = jwt.sign(
             { "user": foundUser.user},
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '5m' }
+            { expiresIn: '30m' }
         );
         const refreshToken = jwt.sign(
             { "user": foundUser.user},
@@ -120,7 +128,8 @@ const handleLogin = async (req, res) => {
         );
         insertRefreshToken.save();
         res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
-        res.cookie('logged', 'yes', {httpOnly: false, sameSite:'None', secure: true, maxAge: 24 * 60 * 60 * 1000 }); //top 10 implementacoes de manter login
+        res.cookie('logged', 'yes', {httpOnly: false, sameSite:'None', secure: true, maxAge: 24 * 60 * 60 * 1000}); //top 10 implementacoes de manter login
+        res.cookie('roles', role, {httpOnly: false, sameSite:'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
         res.json({accessToken});
     } else {
         res.sendStatus(401);
@@ -141,7 +150,7 @@ const handleRefreshToken = async (req, res) => {
             const accessToken = jwt.sign(
                 { 'user': decoded.user},
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '5m'}
+                { expiresIn: '30m'}
                 );
                 res.json({ accessToken })
         } 
@@ -197,6 +206,13 @@ const deleteTipo = async (req, res) => {
     const tipoToDelete = await Tipos.findOneAndDelete({ tipo: req.params.tipo })
     res.status(200);
     res.json(tipoToDelete);
+}
+
+const editTipo = async (req, res) => {
+    const tipoToEdit = await Tipos.findOneAndUpdate({ tipo: req.params.tipo },
+        { $set: { tipo: req.body.tipo}})
+    tipoToEdit.save();
+    res.json(tipoToEdit);
 }
 
 
@@ -292,6 +308,7 @@ app.put("/pendencias/andamento/:id", newAndamento);
 app.post("/tipos/new", newTipo);
 app.get("/tipos/get", getTipos);
 app.delete("/tipos/delete/:tipo", deleteTipo);
+app.put("/tipos/edit/:tipo", editTipo)
 app.put("/usuarios/edit/:name", editUsuario);
 app.delete("/usuarios/delete/:name", deleteUsuario);
 app.delete("/pendencias/delete/:id", async (req, res) => {
