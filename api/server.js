@@ -24,8 +24,8 @@ const app = express();
 
 
 // const options = {
-//     key: fs.readFileSync('/etc/pki/nginx/private/server.key'),
-//     cert: fs.readFileSync('/etc/pki/nginx/server.crt')
+//     key: fs.readFileSync('/var/www/pendencias/certs/private/server.key'),
+//     cert: fs.readFileSync('/var/www/pendencias/certs/server.crt')
 // };
 
 // const httpsServer = https.createServer(options, app);
@@ -46,7 +46,7 @@ mongoose.connect("mongodb://10.10.10.150:27017/pendencias", {
     useUnifiedTopology: true
 })
     .then(() => console.log("Connected to DB"))
-    .catch(console.error);
+    .catch(console.log("Não foi possível conectar ao db"));
 
 const Pendencias = require("./models/pendencias");
 const Usuarios = require("./models/usuarios");
@@ -189,8 +189,9 @@ const handleLogout = async (req, res) => {
 
 //tipos
 const newTipo = async (req, res) => {
+    const stipo = req.body.tipo.replace(/\s+$/, '');
     const tipos = new Tipos({
-        tipo: req.body.tipo
+        tipo: stipo
     });
 
     const savetipo = await tipos.save();
@@ -209,9 +210,9 @@ const deleteTipo = async (req, res) => {
 }
 
 const editTipo = async (req, res) => {
+    const stipo = req.body.tipo.replace(/\s+$/, '');
     const tipoToEdit = await Tipos.findOneAndUpdate({ tipo: req.params.tipo },
-        { $set: { tipo: req.body.tipo}})
-    tipoToEdit.save();
+        { $set: { tipo: stipo}})
     res.json(tipoToEdit);
 }
 
