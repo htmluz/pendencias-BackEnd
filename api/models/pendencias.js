@@ -88,6 +88,10 @@ const PendenSchema = new Schema({
             type: Date,
             required: false
         }
+    },
+    unidade: {
+        type: String,
+        default: "TIO"
     }
 })
 

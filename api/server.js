@@ -99,7 +99,6 @@ const editUsuario = async (req, res) => {
         userEdit.save();
         res.json(userEdit)
     } 
-    
 }
 
 //autenticacao
@@ -232,6 +231,16 @@ const getPendencias = async (req, res) => {   //busca pendencias
     res.json(pendens);
 }
 
+const getPendenciasTIOOpen = async (req, res) => {
+    const pendens = await Pendencias.find({complete: false});
+    res.json(pendens);
+}
+
+const getPendenciasTIOComplete = async (req, res) => {
+    const pendens = await Pendencias.find({complete: true});
+    res.json(pendens);
+}
+
 const novaPendencia = async (req, res) => {
     const nextId = await getNextId();
     const pendencia = new Pendencias({
@@ -248,7 +257,8 @@ const novaPendencia = async (req, res) => {
         abertura: req.body.abertura,
         fechamento: {
             user: ""
-        }
+        },
+        unidade: req.body.unidade
     });
     const savependencia = await pendencia.save();
     res.json(pendencia);
@@ -302,6 +312,8 @@ app.get("/usuarios/logout", handleLogout);
 app.get("/usuarios/get", getUsuarios);
 app.use(verificarJWT);
 app.get("/getpendencias", getPendencias);
+app.get("/pendencias/get/openTIO", getPendenciasTIOOpen);
+app.get("/pendencias/get/completeTIO", getPendenciasTIOComplete);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
 app.put("/pendencias/edit/:id", editPendencia);
