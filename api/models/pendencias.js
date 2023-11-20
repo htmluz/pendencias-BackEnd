@@ -74,7 +74,6 @@ const PendenSchema = new Schema({
         },
         dateopening: {
             type: Date,
-            default: new Date(),
             required: false
         }
     },

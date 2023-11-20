@@ -226,19 +226,35 @@ async function getNextId() {
         return counter.count;
 }
 
-const getPendencias = async (req, res) => {   //busca pendencias
-    const pendens = await Pendencias.find();   
+const getPendenciasOPEN = async (req, res) => {   //busca pendencias
+    const pendens = await Pendencias.find({complete: false});   
     res.json(pendens);
 }
 
 const getPendenciasTIOOpen = async (req, res) => {
-    const pendens = await Pendencias.find({complete: false});
+    const pendens = await Pendencias.find({complete: false, unidade: "TIO"});
     res.json(pendens);
 }
 
 const getPendenciasTIOComplete = async (req, res) => {
-    const pendens = await Pendencias.find({complete: true});
+    const pendens = await Pendencias.find({complete: true, unidade: "TIO"});
     res.json(pendens);
+}
+
+
+const getPendenciasSYGOOpen = async (req, res) => {
+    const pendens = await Pendencias.find({complete: false, unidade: "SYGO"});
+    res.json(pendens);
+}
+
+const getPendenciasSYGOComplete = async (req, res) => {
+    const pendens = await Pendencias.find({complete: true, unidade: "SYGO"});
+    res.json(pendens);
+}
+
+const getManutencao = async (req, res) => {
+    const manut = await Pendencias.find({complete: false, tipo: "Campanha de Manutenção"});
+    res.json(manut);
 }
 
 const novaPendencia = async (req, res) => {
@@ -310,10 +326,13 @@ app.post("/usuarios/auth", handleLogin);
 app.get("/usuarios/refresh", handleRefreshToken);
 app.get("/usuarios/logout", handleLogout);
 app.get("/usuarios/get", getUsuarios);
+app.get("/pendencias/get/dashboard", getPendenciasOPEN);
 app.use(verificarJWT);
-app.get("/getpendencias", getPendencias);
 app.get("/pendencias/get/openTIO", getPendenciasTIOOpen);
 app.get("/pendencias/get/completeTIO", getPendenciasTIOComplete);
+app.get("/pendencias/get/openSYGO", getPendenciasSYGOOpen);
+app.get("/pendencias/get/completeSYGO", getPendenciasSYGOComplete);
+app.get("/pendencias/get/manut", getManutencao);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
 app.put("/pendencias/edit/:id", editPendencia);
