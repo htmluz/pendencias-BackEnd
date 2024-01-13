@@ -91,7 +91,12 @@ const PendenSchema = new Schema({
     unidade: {
         type: String,
         default: "TIO"
+    },
+    massiva: {
+        type: Boolean,
+        default: false
     }
+
 })
 
 

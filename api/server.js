@@ -274,7 +274,8 @@ const novaPendencia = async (req, res) => {
         fechamento: {
             user: ""
         },
-        unidade: req.body.unidade
+        unidade: req.body.unidade,
+        massiva: req.body.massiva
     });
     const savependencia = await pendencia.save();
     res.json(pendencia);
@@ -300,7 +301,9 @@ const editPendencia = async (req, res) => {
         dateatt: req.body.dateatt,
         desc: req.body.desc,
         taskid: req.body.taskid,
-        incidenturl: req.body.incidenturl }
+        incidenturl: req.body.incidenturl,
+        massiva: req.body.massiva
+    }
         });
     pendencia.save();
     res.json(pendencia);
