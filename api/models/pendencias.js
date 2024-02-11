@@ -18,7 +18,6 @@ const AndamentosSchema = new Schema({
     type: String,
     required: false,
   },
-  paths: [String],
 });
 
 const PendenSchema = new Schema({

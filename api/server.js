@@ -10,9 +10,6 @@ const corsOptions = require("./config/corsOptions");
 const moment = require("moment-timezone");
 const https = require("https");
 const fs = require("fs");
-const multer = require("multer");
-const upload = multer({ dest: "public" });
-const path = require("path");
 
 const credentials = (req, res, next) => {
   const origin = req.headers.origin;
@@ -35,7 +32,6 @@ const app = express();
 //     console.log('Https server started on port 3001');
 // });
 
-app.listen(3001, () => console.log("Server started on port 3001"));
 app.use(credentials);
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -44,6 +40,7 @@ app.use((req, res, next) => {
   console.log(`${req.url}`);
   next();
 });
+app.listen(3001, () => console.log("Server started on port 3001"));
 
 mongoose
   .connect("mongodb://10.10.10.150:27017/pendencias", {
@@ -342,26 +339,11 @@ const editPendencia = async (req, res) => {
 
 const newAndamento = async (req, res) => {
   try {
-    const paths = [];
-    console.log(req.files);
-    for (let i = 0; i < req.files.length; i++) {
-      const name = req.files[i].originalname;
-      const ext = path.extname(name);
-
-      const newName = `${Date.now()}_${i}${ext}`;
-      const filePath = path.join(__dirname, "/public/", newName);
-
-      fs.renameSync(req.files[i].path, filePath);
-
-      paths.push(filePath);
-    }
-
     const novoAndamento = {
       id: req.body.id,
       dateandamento: moment().tz("America/Sao_Paulo"),
       user: req.body.user,
       andamento: req.body.andamento,
-      paths: paths,
     };
     const andamento = await Pendencias.findOneAndUpdate(
       { id: req.params.id },
@@ -374,16 +356,9 @@ const newAndamento = async (req, res) => {
   }
 };
 
-const getFiles = async (req, res) => {
-  const fileName = req.params.name;
-  const filePath = path.join(__dirname, "public", fileName);
-  res.sendFile(filePath);
-};
-
 //rotas
 
 app.post("/usuarios/new", novoUsuario);
-app.get("/pendencias/imgs/:name", getFiles);
 app.post("/usuarios/auth", handleLogin);
 app.get("/usuarios/refresh", handleRefreshToken);
 app.get("/usuarios/logout", handleLogout);
@@ -398,7 +373,7 @@ app.get("/pendencias/get/manut", getManutencao);
 app.post("/pendencias/new", novaPendencia);
 app.put("/pendencias/complete/:id", completaPendencia);
 app.put("/pendencias/edit/:id", editPendencia);
-app.put("/pendencias/andamento/:id", upload.array("files", 10), newAndamento);
+app.put("/pendencias/andamento/:id", newAndamento);
 app.post("/tipos/new", newTipo);
 app.get("/tipos/get", getTipos);
 app.delete("/tipos/delete/:tipo", deleteTipo);
