@@ -340,10 +340,10 @@ const editPendencia = async (req, res) => {
 const newAndamento = async (req, res) => {
   try {
     const novoAndamento = {
-      id: req.body.id,
+      id: req.body.andamento.id,
       dateandamento: moment().tz("America/Sao_Paulo"),
-      user: req.body.user,
-      andamento: req.body.andamento,
+      user: req.body.andamento.user,
+      andamento: req.body.andamento.andamento,
     };
     const andamento = await Pendencias.findOneAndUpdate(
       { id: req.params.id },
