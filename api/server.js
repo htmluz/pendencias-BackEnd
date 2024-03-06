@@ -36,10 +36,10 @@ app.use(credentials);
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-app.use((req, res, next) => {
-  console.log(`${req.url}`);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`${req.url}`);
+//   next();
+// });
 app.listen(3001, () => console.log("Server started on port 3001"));
 
 mongoose
@@ -330,6 +330,7 @@ const editPendencia = async (req, res) => {
         taskid: req.body.taskid,
         incidenturl: req.body.incidenturl,
         massiva: req.body.massiva,
+        unidade: req.body.unidade,
       },
     }
   );
