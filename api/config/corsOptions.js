@@ -1,8 +1,7 @@
-const allowedOrigins = require("./alllowedOrigins");
+const allowedOrigins = require("./allowedOrigins");
 
 const corsOptions = {
-    origin: allowedOrigins
-    }
-
+  origin: allowedOrigins,
+};
 
 module.exports = corsOptions;
